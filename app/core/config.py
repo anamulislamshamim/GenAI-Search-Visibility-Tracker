@@ -27,10 +27,11 @@ class Settings(BaseSettings):
     # --- Data Store URIs ---
     MONGO_URI: str  = "mongodb://mongodb:27017"
     MONGO_DB_NAME: str = "query_analytics"
-    MONGO_COLLECTION_NAME: str = "search_queries"
+    MONGO_COLLECTION_NAME: str = "brand_analysis"
     ELASTICSEARCH_URL: str = "http://localhost:9200"
     ES_INDEX_NAME: str = "brand_analysis"
     POSTGRES_URL: str = "postgresql://user:password@postgres:5432/main_db"
+    POSTGRES_TABLE: str = "brand_analysis"
 
 # Initialize settings object
 settings = Settings()
