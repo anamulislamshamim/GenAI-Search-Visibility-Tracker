@@ -77,7 +77,7 @@ const StatusPoller: React.FC<Props> = ({ responseId, brandName, onCompleteMetric
 
       {lastPayload && (
         <div className="bg-gray-50 p-4 rounded-md border border-gray-200 overflow-auto">
-          <h4 className="text-lg font-semibold mb-2">Last Response:</h4>
+          <h4 className="text-lg font-semibold mb-2">Last Query Result:</h4>
           <p className="mb-2">
             <strong>Brand Name:</strong> {lastPayload.brand_name}
           </p>

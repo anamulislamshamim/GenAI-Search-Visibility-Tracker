@@ -59,7 +59,7 @@ async def get_current_user(token: Optional[str] = Depends(get_token_from_cookie)
                 headers={"WWW-Authenticate": "Bearer"},
             )
             
-        # NOTE: In a real app, you would now fetch the user from the DB 
+        # you would now fetch the user from the DB 
         # (e.g., get_user_by_email) to ensure the user still exists and is active.
         return email
         

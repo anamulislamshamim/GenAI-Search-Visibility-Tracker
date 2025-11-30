@@ -33,6 +33,7 @@ const QueryForm: React.FC<Props> = ({ onSubmitted }) => {
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-1">Brand name</label>
     <input
+      placeholder="Elelem"
       value={brand}
       onChange={(e) => setBrand(e.target.value)}
       required
