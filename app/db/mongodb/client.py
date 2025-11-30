@@ -30,3 +30,9 @@ async def close_mongodb():
     if db_client:
         db_client.close()
         print("MongoDB connection closed.")
+
+def get_mongo_db():
+    if mongo_db is not None:
+        return mongo_db
+    else:
+        raise Exception("MongoDB connection error!")

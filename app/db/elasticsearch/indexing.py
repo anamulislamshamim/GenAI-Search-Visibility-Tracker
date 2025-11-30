@@ -1,12 +1,8 @@
-from typing import Dict, Any
-from db.elasticsearch.client import es_client, ES_INDEX_NAME
+from typing import Dict, Any, Optional
+from app.db.elasticsearch.client import ES_INDEX_NAME, get_es_client
 
 # Index mapping defines the schema for documents in Elasticsearch
 INDEX_MAPPING: Dict[str, Any] = {
-    "settings": {
-        "number_of_shards": 1,
-        "number_of_replicas": 0
-    },
     "mappings": {
         "properties": {
             "response_id": {"type": "keyword"},
@@ -17,9 +13,8 @@ INDEX_MAPPING: Dict[str, Any] = {
             "timestamp": {"type": "date"},
             "embedding_vector": {
                 "type": "dense_vector",
-                # The model 'all-MiniLM-L6-v2' produces a 384-dimensional vector
-                "dims": 384, 
-                "index": True,
+                "dims": 384,
+                "index": True,        # allowed in serverless if vector search is enabled
                 "similarity": "cosine"
             }
         }
@@ -28,7 +23,8 @@ INDEX_MAPPING: Dict[str, Any] = {
 
 async def initialize_es_index():
     """Checks if the index exists and creates it if it doesn't."""
-    if es_client is None:
+    es_client = get_es_client()
+    if not await es_client.ping():
         raise ConnectionError("Elasticsearch client is not initialized.")
 
     if not await es_client.indices.exists(index=ES_INDEX_NAME):
@@ -41,6 +37,7 @@ async def initialize_es_index():
 
 async def index_analysis_document(document: Dict[str, Any]) -> None:
     """Inserts the final analysis document into Elasticsearch."""
+    es_client = get_es_client()
     if es_client is None:
         raise ConnectionError("Elasticsearch client is not initialized.")
         

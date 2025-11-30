@@ -9,13 +9,13 @@ from app.analysis.nlp_pipeline import initialize_nlp_models
 async def connect_to_dbs():
     """Initializes and connects to all database clients."""
     # This is the central control point for connecting all databases.
+    await connect_to_elasticsearch()
     await connect_to_mongodb()
     await connect_to_postgres()
-    await connect_to_elasticsearch()
 
-    await initialize_es_index()
     await initialize_nlp_models()
     await _create_brand_performance_table()
+    await initialize_es_index()
 
 async def close_dbs():
     """Closes all database connections."""

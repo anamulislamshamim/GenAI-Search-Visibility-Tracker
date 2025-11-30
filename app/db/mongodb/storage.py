@@ -2,12 +2,13 @@ import datetime
 from typing import Any, Dict
 from bson.objectid import ObjectId
 from app.core.config import settings
-from app.db.mongodb.client import mongo_db
+from app.db.mongodb.client import get_mongo_db
 
 
 COLLECTION_NAME = settings.MONGO_COLLECTION_NAME
 
 async def insert_query_record(document: dict[str, Any]) -> str:
+    mongo_db = get_mongo_db()
     if mongo_db is None:
         raise ConnectionError("MongoDB client is not initialized. Check startup event.")
         
@@ -17,6 +18,7 @@ async def insert_query_record(document: dict[str, Any]) -> str:
     return str(result.inserted_id)
 
 async def update_query_status_and_score(response_id: str, visibility_score: float) -> None:
+    mongo_db = get_mongo_db()
     if mongo_db is None:
         raise ConnectionError("MongoDB client is not initialized. Cannot update record.")
 
@@ -48,6 +50,7 @@ async def get_query_details_by_id(response_id: str) -> Dict[str, Any] | None:
     """
     Feature 5: Retrieves the full query record (including status and score) from MongoDB.
     """
+    mongo_db = get_mongo_db()
     if mongo_db is None:
         raise ConnectionError("MongoDB client is not initialized. Cannot fetch record.")
 

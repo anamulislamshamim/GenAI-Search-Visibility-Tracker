@@ -1,6 +1,6 @@
 import datetime
 from typing import Any, Dict
-from app.db.postgres.client import postgres_pool
+from app.db.postgres.client import get_postgres_pool
 
 async def insert_brand_performance(
     response_id: str, 
@@ -15,6 +15,7 @@ async def insert_brand_performance(
         brand_name: The name of the brand queried.
         visibility_score: The final calculated score (0-100).
     """
+    postgres_pool = get_postgres_pool()
     if postgres_pool is None:
         raise ConnectionError("PostgreSQL connection pool is not initialized.")
 
@@ -49,6 +50,7 @@ async def get_brand_metrics(brand_name: str) -> Dict[str, Any]:
     Returns:
         A dictionary containing the average score and the total number of records.
     """
+    postgres_pool = get_postgres_pool()
     if postgres_pool is None:
         raise ConnectionError("PostgreSQL connection pool is not initialized.")
 

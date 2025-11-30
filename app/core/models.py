@@ -11,7 +11,7 @@ class BrandQuery(BaseModel):
 class QueryResponse(BaseModel):
     brand_name: str = Field(..., example="Pathao")
     raw_llm_response: str = Field(..., description="The unedited text response from the GenAI model.")
-    response_id: str = Field(..., description="Unique ID for this response, used for future lookup in MongoDB/ES.")
+    response_id: str | None = None
     status: str = Field(..., description="Status of the operation (e.g., 'Processing', 'Complete').", example="Processing")
 
 

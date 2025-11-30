@@ -3,36 +3,36 @@ version: '3.8'
 services:
 
   # 1. MongoDB Service (for storing query logs/metadata)
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb_local
-    restart: always
-    ports:
-      # Default MongoDB port
-      - "27017:27017"
-    volumes:
-      # Persist data
-      - mongo_data:/data/db
-    networks:
-      - app-network
+  # mongodb:
+  #   image: mongo:latest
+  #   container_name: mongodb_local
+  #   restart: always
+  #   ports:
+  #     # Default MongoDB port
+  #     - "27017:27017"
+  #   volumes:
+  #     # Persist data
+  #     - mongo_data:/data/db
+  #   networks:
+  #     - app-network
 
   # 2. PostgreSQL Service (for structured data/relational tasks)
-  postgres:
-    image: postgres:16-alpine
-    container_name: postgres_local
-    restart: always
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: main_db
-    ports:
-      # Default PostgreSQL port
-      - "5432:5432"
-    volumes:
-      # Persist data
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app-network
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: postgres_local
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: user
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_DB: main_db
+  #   ports:
+  #     # Default PostgreSQL port
+  #     - "5432:5432"
+  #   volumes:
+  #     # Persist data
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - app-network
 
   # 3. Elasticsearch Service (for full-text search and indexing)
   elasticsearch:

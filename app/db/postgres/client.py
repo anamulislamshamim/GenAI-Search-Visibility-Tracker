@@ -32,6 +32,12 @@ async def close_postgres():
         await postgres_pool.close()
         print("PostgreSQL connection closed.")
 
+def get_postgres_pool():
+    if postgres_pool is not None:
+        return postgres_pool
+    else:
+        raise Exception("Postgres connection error..")
+
 async def _create_brand_performance_table():
     """Creates the brand_performance table if it does not exist."""
     CREATE_TABLE_QUERY = """
