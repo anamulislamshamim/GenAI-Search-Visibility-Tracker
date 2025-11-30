@@ -34,5 +34,9 @@ class Settings(BaseSettings):
     POSTGRES_URL: str = "postgresql://user:password@postgres:5432/main_db"
     POSTGRES_TABLE: str = "brand_analysis"
 
+    SECRET_KEY: str ="secret-my-secret"
+    ALGORITHM: str ="md5"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+
 # Initialize settings object
 settings = Settings()
