@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Response
 from fastapi.responses import JSONResponse
 from app.auth.models.auth_models import LoginPayload, UserInDB
 from app.db.mongodb.user_storage import get_user_by_email, create_user
 from app.auth.core.utils import verify_password, create_access_token
+from app.core.config import settings
+from datetime import timedelta
 
 
 router = APIRouter()
@@ -27,45 +29,85 @@ async def signup(user_data: LoginPayload):
     return {"message": "User successfully registered.", "email": new_user.email}
 
 @router.post("/login")
-async def login_for_access_token(response: JSONResponse, form_data: LoginPayload = Depends()):
+async def login_for_access_token(
+    form_data: LoginPayload, 
+    response: Response
+):
     """
     Authenticates a user via email and password, returning a secure HTTP-only cookie
     containing the JWT access token.
     """
+    # 1. Look up user by email
     user = await get_user_by_email(form_data.email)
     
-    if not user:
+    # 2. Authentication check
+    if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    # Verify the password against the stored hash
-    if not verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
         
-    # Create the JWT token
+    # 3. Create the JWT token
     access_token = create_access_token(data={"email": user.email})
     
-    # Successful login response
-    response_content = {"message": "Login successful"}
-    response = JSONResponse(content=response_content)
-    
-    # Set the secure, HTTP-only cookie
-    # httponly=True: Prevents JavaScript access (XSS defense)
-    # secure=True: Ensures cookie is only sent over HTTPS (production requirement)
-    # samesite="strict": Protects against CSRF (Cross-Site Request Forgery)
+    # 4. Set the secure, HTTP-only cookie
     response.set_cookie(
         key="access_token",
         value=f"Bearer {access_token}",
+        # Set max-age for persistence (e.g., 24 hours)
+        max_age=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES).total_seconds(), 
         httponly=True,
-        secure=True, 
-        samesite="strict" 
+        # Ensure 'secure=True' is used in production (settings.ENVIRONMENT check is best)
+        secure=settings.ENVIRONMENT != "development", 
+        samesite="lax" # 'strict' can cause issues with external links; 'lax' is safer default
     )
     
-    return response
+    # 5. Return a successful JSON response
+    # We return a standard dict/Token model, and FastAPI handles serialization.
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+# @router.post("/login")
+# async def login_for_access_token(response: JSONResponse, form_data: LoginPayload = Depends()):
+#     """
+#     Authenticates a user via email and password, returning a secure HTTP-only cookie
+#     containing the JWT access token.
+#     """
+#     user = await get_user_by_email(form_data.email)
+    
+#     if not user:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Incorrect username or password",
+#             headers={"WWW-Authenticate": "Bearer"},
+#         )
+    
+#     # Verify the password against the stored hash
+#     if not verify_password(form_data.password, user.hashed_password):
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#             detail="Incorrect username or password",
+#             headers={"WWW-Authenticate": "Bearer"},
+#         )
+        
+#     # Create the JWT token
+#     access_token = create_access_token(data={"email": user.email})
+    
+#     # Successful login response
+#     response_content = {"message": "Login successful"}
+#     response = JSONResponse(content=response_content)
+    
+#     # Set the secure, HTTP-only cookie
+#     # httponly=True: Prevents JavaScript access (XSS defense)
+#     # secure=True: Ensures cookie is only sent over HTTPS (production requirement)
+#     # samesite="strict": Protects against CSRF (Cross-Site Request Forgery)
+#     response.set_cookie(
+#         key="access_token",
+#         value=f"Bearer {access_token}",
+#         httponly=True,
+#         secure=True, 
+#         samesite="strict" 
+#     )
+    
+#     return response

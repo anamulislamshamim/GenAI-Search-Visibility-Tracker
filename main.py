@@ -5,6 +5,7 @@ from app.auth.routers.auth_router import router as auth_router
 from app.core.config import settings
 from app.db.utils import connect_to_dbs, close_dbs
 from contextlib import asynccontextmanager
+from starlette.middleware.cors import CORSMiddleware
 
 
 # load .env 
@@ -25,6 +26,22 @@ app = FastAPI(
     title="Elelem Visibility Backend",
     description=f"GenAI Visibility Scoring API | Environment: {settings.ENVIRONMENT}",
     version="1.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    # Allow all origins for now, but uncomment 'allow_origins' below for production
+    allow_origins=["*"], # WARNING: Use specific origins in production!
+    # allow_origins=origins, # Use this in production
+    
+    # Allow credentials (necessary for cookies/JWT in HTTP-only cookies)
+    allow_credentials=True, 
+    
+    # Allow specific HTTP methods (POST, GET, OPTIONS are standard)
+    allow_methods=["*"], 
+    
+    # Allow specific headers (necessary for Content-Type, Authorization, etc.)
+    allow_headers=["*"], 
 )
 
 # Include the API router with a prefix 

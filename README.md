@@ -292,8 +292,8 @@ Frontend is deployed separately to Cloud Run.
 
 | Method | Endpoint                   | Description                             |
 | ------ | -------------------------- | --------------------------------------- |
-| POST   | `/api/v1/brand/query`         | Query Gemini for brand visibility       |
-| GET    | `/api/v1/metrics/aggregate/brand`  | Aggregated visibility metrics           |
+| POST   | `/api/v1/brand-query`         | Query Gemini for brand visibility       |
+| GET    | `/api/v1/metrics/aggregate/{brand_name}`  | Aggregated visibility metrics           |
 | GET    | `/api/v1/query/<response_id>` | Check specific LLM response + RAG score |
 
 ---
