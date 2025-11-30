@@ -28,7 +28,6 @@ async def query_brand(
     try:
         # 1. Hit GenAI (LLM) API (Feature 1)
         raw_llm_response = await llm_service.generate_response(query_prompt)
-        print("raw_llm_response", raw_llm_response)
         # Unique ID for tracking this specific request/response
         response_id: str | None = None
 
