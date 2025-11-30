@@ -57,6 +57,3 @@ def decode_access_token(token: str) -> Optional[dict[str, Any]]:
 
     except JWTError:
         return None # Invalid token structure or signature
-
-if __name__ == "__main__": 
-    print(hash_password("12345"))
