@@ -1,0 +1,39 @@
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from enum import Enum
+
+
+class Environment(str, Enum):
+    LOCAL = "LOCAL"
+    CLOUD = "CLOUD"
+
+class LLMProvider(str, Enum):
+    HUGGINGFACE = "HUGGINGFACE"
+    GEMINI = "GEMINI"
+    OPENAI = "OPENAI"
+
+class Settings(BaseSettings):
+    # Load configuration from .env file 
+    model_config = SettingsConfigDict(env_file=".env", extra='ignore')
+
+    # --- General ---
+    ENVIRONMENT: Environment = Environment.LOCAL
+
+    # --- LLM Settings ---
+    LLM_PROVIDER: LLMProvider = LLMProvider.GEMINI
+    HUGGINGFACE_MODEL: str = "local/mock-model"
+    GEMINI_API_KEY: str | None = None
+    OPENAI_API_KEY: str | None = None
+
+    # --- Data Store URIs ---
+    MONGO_URI: str  = "mongodb://mongodb:27017"
+    MONGO_DB_NAME: str = "query_analytics"
+    MONGO_COLLECTION_NAME: str = "search_queries"
+    ELASTICSEARCH_URL: str = "http://localhost:9200"
+    ES_INDEX_NAME: str = "brand_analysis"
+    POSTGRES_URL: str = "postgresql://user:password@postgres:5432/main_db"
+
+# Initialize settings object
+settings = Settings()
+
+# print
+print(settings.HUGGINGFACE_MODEL)

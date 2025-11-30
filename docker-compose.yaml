@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+
+  # 1. MongoDB Service (for storing query logs/metadata)
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_local
+    restart: always
+    ports:
+      # Default MongoDB port
+      - "27017:27017"
+    volumes:
+      # Persist data
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
+  # 2. PostgreSQL Service (for structured data/relational tasks)
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_local
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: main_db
+    ports:
+      # Default PostgreSQL port
+      - "5432:5432"
+    volumes:
+      # Persist data
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  # 3. Elasticsearch Service (for full-text search and indexing)
+  elasticsearch:
+    image: elasticsearch:8.14.0
+    container_name: elasticsearch_local
+    restart: always
+    environment:
+      # Required for running in a single-node setup for development
+      - discovery.type=single-node
+      # Allow HTTP access without security setup for development
+      - xpack.security.enabled=false
+    ulimits:
+      # Required for Elasticsearch
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      # Default Elasticsearch HTTP port
+      - "9200:9200"
+      # Default Elasticsearch transport port
+      - "9300:9300"
+    volumes:
+      # Persist data
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo_data:
+  postgres_data:
+  es_data:
