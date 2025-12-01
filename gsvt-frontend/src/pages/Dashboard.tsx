@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import QueryForm from "../components/QueryForm";
 import StatusPoller from "../components/StatusPoller";
 import MetricsChart from "../components/MetricsChart";
+import { useAuthContext } from "../auth/AuthProvider";
 
 type Metrics = {
   total_query: number;
@@ -10,12 +11,21 @@ type Metrics = {
 };
 
 const Dashboard: React.FC = () => {
+  const { logout } = useAuthContext();
+
   const [brandName, setBrandName] = useState<string | null>(null);
   const [responseId, setResponseId] = useState<string | null>(null);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
+      {/* Logout Button */}
+      <button
+        onClick={logout}
+        className="absolute top-4 right-4 px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
+      >
+        Logout
+      </button>
       {/* Header */}
       <header className="w-full flex justify-center mb-8">
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 drop-shadow-lg">

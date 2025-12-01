@@ -68,6 +68,27 @@ async def login_for_access_token(
     # We return a standard dict/Token model, and FastAPI handles serialization.
     return {"access_token": access_token, "token_type": "bearer"}
 
+@router.post("/logout")
+async def logout(response: Response):
+    """
+    Logs out the user by clearing the access_token cookie.
+    """
+    try:
+        get_current_user()
+        response.delete_cookie(
+            key="access_token",
+            httponly=True,
+            secure=settings.ENVIRONMENT != "development",
+            samesite="lax"
+        )
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized attempt!",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    return {"message": "Logged out successfully"}
 
 @router.get("/me")
 async def verify_cookie():

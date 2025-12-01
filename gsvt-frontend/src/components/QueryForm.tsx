@@ -12,7 +12,7 @@ const QueryForm: React.FC<Props> = ({ onSubmitted }) => {
   const [err, setErr] = useState<string | null>(null);
 
   const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); 
     setErr(null);
     setLoading(true);
     try {
