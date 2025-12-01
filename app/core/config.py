@@ -38,5 +38,10 @@ class Settings(BaseSettings):
     ALGORITHM: str ="md5"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    # BiqQuery
+    GCP_PROJECT_ID: str = ""
+    BQ_DATASET_ID: str = ""
+    BQ_TABLE_ID: str = ""
+
 # Initialize settings object
 settings = Settings()
