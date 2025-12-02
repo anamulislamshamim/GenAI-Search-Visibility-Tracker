@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, List
 import datetime
 
 
@@ -42,3 +42,17 @@ class QueryDetails(BaseModel):
     raw_llm_response: str
     processed_at: datetime.datetime | None = Field(None, description="UTC timestamp when processing completed.")
 
+
+# BigQuery
+class BigQueryHistoryRecord(BaseModel):
+    """
+    Immutable historical record stored in BigQuery.
+    """
+    response_id: str
+    brand_keyword: str
+    keywords: str                      # Same structure as ES
+    sentiment_score: float
+    visibility_score: float
+    timestamp: datetime
+    llm_response: str                  # Important for historical audit
+    created_at: datetime = Field(default_factory=datetime.utcnow)

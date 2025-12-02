@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional, Any
 from pydantic import BaseModel, Field
 
+
 # 1. Define the structure for data being inserted into BigQuery
 # This is a sample schema for a simple log record.
 class LogRecord(BaseModel):
@@ -19,6 +20,7 @@ class LogRecord(BaseModel):
         allow_population_by_field_name = True
         # For compatibility with FastAPI and ORM/DB
         from_attributes = True
+
 
 # 2. Define the structure for the query parameters
 class QueryParameters(BaseModel):

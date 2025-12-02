@@ -3,9 +3,12 @@ from google.cloud.bigquery.job import QueryJob
 from google.api_core import exceptions
 from typing import Any, List, Dict, Optional
 from google.cloud import bigquery
-
+from asyncio import to_thread
 from app.db.big_query.client import BigQueryClient
-from app.db.big_query.schemas import LogRecord, QueryParameters
+from app.db.big_query.schemas import QueryParameters
+from app.core.models import BigQueryHistoryRecord
+from app.core.config import settings
+
 
 class BigQueryService:
     """
@@ -40,11 +43,13 @@ class BigQueryService:
         except Exception as e:
             print(f"An unexpected error occurred during query execution: {e}")
             raise
-
-
-    def insert_record(self, record: LogRecord) -> bool:
+    
+    async def insert_record(self, record: BigQueryHistoryRecord) -> bool:
         """
-        Inserts a single LogRecord into the configured BigQuery table.
+        Inserts a single LogRecord into the configured BigQuery table asynchronously.
+        
+        Uses to_thread.run_sync to safely call the synchronous BigQuery client 
+        without blocking the main FastAPI event loop.
 
         Args:
             record: A validated LogRecord Pydantic model instance.
@@ -57,18 +62,29 @@ class BigQueryService:
         
         # BigQuery expects the timestamp as a string or compatible object
         row_to_insert['timestamp'] = row_to_insert['timestamp'].isoformat()
-
-        errors = self.client.insert_rows_json(
-            table=self.table_ref,
-            json_rows=[row_to_insert]
-        )
-
-        if errors:
-            print(f"Errors occurred during row insertion: {errors}")
-            return False
         
-        print(f"Successfully inserted 1 record into {self.full_table_id}")
-        return True
+        # Define the synchronous function to execute in the thread pool
+        def sync_insert():
+            return self.client.insert_rows_json(
+                table=self.table_ref,
+                json_rows=[row_to_insert]
+            )
+
+        try:
+            # Use to_thread.run_sync to run the blocking database call
+            errors = await to_thread(sync_insert)
+            
+            if errors:
+                print(f"Errors occurred during row insertion: {errors}")
+                return False
+            
+            print(f"Successfully inserted 1 record into {self.full_table_id}")
+            return True
+
+        except Exception as e:
+            print(f"An error occurred during asynchronous insertion: {e}")
+            return False
+
 
 BQ_SERVICE = None
 async def connect_to_big_query():
@@ -76,7 +92,7 @@ async def connect_to_big_query():
     global BQ_SERVICE
     print("Attempting to connect to BigQuery...")
     try:
-        BQ_SERVICE = BigQueryService(dataset_id="your_dataset", table_id="your_log_table")
+        BQ_SERVICE = BigQueryService(dataset_id=settings.BQ_DATASET_ID, table_id=settings.BQ_TABLE_ID, project_id=settings.GCP_PROJECT_ID)
     except Exception as e:
         print(f"Could not connect to BigQuery: {e}")
         # In a production environment, you might re-raise to halt startup
@@ -89,7 +105,7 @@ async def close_big_query():
         BQ_SERVICE.client.close()
         print("BigQuery connection closed.")
 
-def get_mongo_big_query():
+def get_big_query():
     if BQ_SERVICE is not None:
         return BQ_SERVICE
     else:

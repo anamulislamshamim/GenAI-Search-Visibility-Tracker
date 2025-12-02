@@ -6,6 +6,8 @@ import datetime
 from app.db.elasticsearch.indexing import index_analysis_document
 from app.db.mongodb.storage import update_query_status_and_score
 from app.db.postgres.storage import insert_brand_performance
+from app.db.big_query.service import get_big_query
+
 
 # Global NLP resources (initialized once)
 model: SentenceTransformer | None = None
@@ -91,6 +93,12 @@ async def start_analysis_pipeline(response_id: str, brand_name: str, raw_llm_res
     await update_query_status_and_score(response_id, visibility_score)
 
     # 6. Insert into PostgreSQL for Structured Reporting (Feature 4)
-    await insert_brand_performance(response_id, brand_name, visibility_score)
+    # await insert_brand_performance(response_id, brand_name, visibility_score)
+
+    # Insert Historical data to BigQuery
+    historic_document = analysis_document.copy()
+    historic_document.pop("embedding_vector")
+    bigquery_client = get_big_query()
+    await bigquery_client.insert_record(record=historic_document)
 
     print(f"--- Analysis and indexing complete for ID: {response_id} ---")
