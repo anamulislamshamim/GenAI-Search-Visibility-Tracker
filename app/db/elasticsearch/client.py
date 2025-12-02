@@ -15,7 +15,11 @@ async def connect_to_elasticsearch():
     print("Attempting to connect to Elasticsearch...")
     try:
         # Placeholder for AsyncElasticsearch initialization
-        es_client = AsyncElasticsearch(hosts=[ELASTICSEARCH_DETAILS], api_key=API_KEY)
+        print("Debug: ", ELASTICSEARCH_DETAILS)
+        if settings.ENVIRONMENT == "CLOUD":
+            es_client = AsyncElasticsearch(hosts=[ELASTICSEARCH_DETAILS], api_key=API_KEY)
+        else:
+            es_client = AsyncElasticsearch(hosts=[ELASTICSEARCH_DETAILS], api_key=API_KEY)
         if not await es_client.ping():
             raise ConnectionError("Elasticsearch client failed to ping.")
         print("Connected successfully to Elasticsearch!")

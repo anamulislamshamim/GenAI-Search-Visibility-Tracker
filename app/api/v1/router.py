@@ -8,7 +8,9 @@ import asyncio
 from app.analysis.nlp_pipeline import start_analysis_pipeline
 from app.db.mongodb.storage import insert_query_record, get_query_details_by_id
 from app.db.big_query.service import get_big_query
+from app.db.postgres.storage import get_brand_metrics
 from app.middlewares.auth_middleware import get_current_user
+from app.core.config import settings
 
 
 router = APIRouter()
@@ -110,16 +112,9 @@ async def get_brand_metrics_aggregate(
     """
     Feature 5 (Aggregate): Retrieves historical average metrics (PostgreSQL).
     """
-    big_query_client = get_big_query()
+    bigquery_client = get_big_query()
     try:
-        metrics = await big_query_client.get_brand_metrics(brand_name=brand_name)
-        
-        # if metrics['total_queries'] == 0:
-        #     raise HTTPException(
-        #         status_code=status.HTTP_404_NOT_FOUND,
-        #         detail=f"No historical queries found for brand '{brand_name}'."
-        #     )
-            
+        metrics = await bigquery_client.get_brand_metrics(brand_name=brand_name) if settings.ENVIRONMENT == "CLOUD" else await get_brand_metrics(brand_name=brand_name)
         return metrics
         
     except ConnectionError as ce:

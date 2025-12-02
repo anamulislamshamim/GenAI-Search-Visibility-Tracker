@@ -1,6 +1,11 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from enum import Enum
+import os 
 
+ENVIRONMENT=os.getenv("ENVIRONMENT", "LOCAL")
+ENV_FILE_NAME=".env" if ENVIRONMENT=="CLOUD" else ".env.local"
+
+print("Debug .env: ", ENVIRONMENT)
 
 class Environment(str, Enum):
     LOCAL = "LOCAL"
@@ -14,7 +19,7 @@ class LLMProvider(str, Enum):
 
 class Settings(BaseSettings):
     # Load configuration from .env file 
-    model_config = SettingsConfigDict(env_file=".env", extra='ignore')
+    model_config = SettingsConfigDict(env_file=ENV_FILE_NAME, extra='ignore')
 
     # --- General ---
     ENVIRONMENT: Environment = Environment.LOCAL
@@ -47,3 +52,4 @@ class Settings(BaseSettings):
 
 # Initialize settings object
 settings = Settings()
+print("Debug settings:", settings.MONGO_URI)

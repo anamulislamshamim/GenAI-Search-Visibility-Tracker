@@ -32,15 +32,11 @@ class AggregateMetrics(BaseModel):
     
     
 class QueryDetails(BaseModel):
-    """
-    Response model for fetching a single query's detailed status/result via response_id (from MongoDB).
-    Matches the structure of the 'response_data' field stored in MongoDB.
-    """
-    response_id: str = Field(..., description="Unique ID of the query.")
+    response_id: str | None = Field(None, description="Unique ID of the query.")
     brand_name: str
     status: str
-    visibility_score: float = Field(..., description="The final calculated score (0-100).")
-    raw_llm_response: str
+    visibility_score: float | None = Field(None, description="The final calculated score (0-100).")
+    raw_llm_response: str | None = None
     processed_at: datetime | None = Field(None, description="UTC timestamp when processing completed.")
 
 

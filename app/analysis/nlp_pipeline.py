@@ -8,6 +8,8 @@ from app.db.elasticsearch.indexing import index_analysis_document, get_visibilit
 from app.db.mongodb.storage import update_query_status_and_score
 from app.db.big_query.service import get_big_query
 from app.core.models import BigQueryHistoryRecord
+from app.core.config import settings
+from app.db.postgres.storage import insert_brand_performance
 
 
 # Global NLP resources
@@ -201,13 +203,15 @@ async def start_analysis_pipeline(response_id: str, brand_name: str, raw_llm_res
     # 6. Update MongoDB record
     await update_query_status_and_score(response_id, visibility_score)
 
-    # 7. Insert Historical Record into BigQuery (embedding removed)
-    historical_doc = analysis_document.copy()
-    historical_doc.pop("embedding_vector", None)
-    historical_doc["llm_response"] = raw_llm_response
-
-    bigquery_client = get_big_query()
-    await bigquery_client.insert_record(record=BigQueryHistoryRecord(**historical_doc))
+    if settings.ENVIRONMENT == "CLOUD":
+        # 7. Insert Historical Record into BigQuery (embedding removed)
+        historical_doc = analysis_document.copy()
+        historical_doc.pop("embedding_vector", None)
+        historical_doc["llm_response"] = raw_llm_response
+        bigquery_client = get_big_query()
+        await bigquery_client.insert_record(record=BigQueryHistoryRecord(**historical_doc))
+    else:
+        await insert_brand_performance(response_id, brand_name, visibility_score)
 
     print(f"--- Enhanced analysis pipeline completed for {response_id} ---")
 
