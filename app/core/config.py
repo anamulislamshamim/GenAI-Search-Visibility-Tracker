@@ -1,8 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from enum import Enum
-import os 
 
-ENVIRONMENT=os.getenv("ENVIRONMENT", "LOCAL")
+ENVIRONMENT="CLOUD"
 ENV_FILE_NAME=".env" if ENVIRONMENT=="CLOUD" else ".env.local"
 
 print("Debug .env: ", ENVIRONMENT)
