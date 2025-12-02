@@ -29,7 +29,7 @@ class OllamaLLM(LLMBase):
         self.client = AsyncClient()
 
     async def generate_response(self, prompt: str) -> str:
-        print("Debug: Ollama")
+        print("OLLAMA gemma:2B generating response...")
         response = await self.client.chat(
             model=self.model_name,
             messages=[{"role": "user", "content": prompt}],
@@ -98,6 +98,7 @@ class GeminiClient(LLMBase):
         The call is wrapped in asyncio.to_thread to make the synchronous API call
         non-blocking for the asynchronous event loop.
         """
+        print("GEMINI-2.5-flash generating response...")
         try:
             # We use asyncio.to_thread to run the synchronous API call
             # in a separate thread, which prevents blocking the event loop.
