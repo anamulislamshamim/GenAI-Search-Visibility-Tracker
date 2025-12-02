@@ -7,6 +7,7 @@ import datetime
 from app.db.elasticsearch.indexing import index_analysis_document, get_visibility_scores
 from app.db.mongodb.storage import update_query_status_and_score
 from app.db.big_query.service import get_big_query
+from app.core.models import BigQueryHistoryRecord
 
 
 # Global NLP resources
@@ -203,9 +204,10 @@ async def start_analysis_pipeline(response_id: str, brand_name: str, raw_llm_res
     # 7. Insert Historical Record into BigQuery (embedding removed)
     historical_doc = analysis_document.copy()
     historical_doc.pop("embedding_vector", None)
+    historical_doc["llm_response"] = raw_llm_response
 
     bigquery_client = get_big_query()
-    await bigquery_client.insert_record(record=historical_doc)
+    await bigquery_client.insert_record(record=BigQueryHistoryRecord(**historical_doc))
 
     print(f"--- Enhanced analysis pipeline completed for {response_id} ---")
 

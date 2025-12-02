@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field, List
-import datetime
+from pydantic import BaseModel, Field
+from typing import List
+from datetime import datetime, timezone
 
 
 # Request Model
@@ -19,7 +20,7 @@ class QueryRecord(BaseModel):
     """Schema for the record stored in MongoDB (Combining input query and final response)."""
     user_query: str
     response_data: QueryResponse
-    timestamp: datetime.datetime
+    timestamp: datetime
     user_id: str | None = None 
 
 
@@ -40,7 +41,7 @@ class QueryDetails(BaseModel):
     status: str
     visibility_score: float = Field(..., description="The final calculated score (0-100).")
     raw_llm_response: str
-    processed_at: datetime.datetime | None = Field(None, description="UTC timestamp when processing completed.")
+    processed_at: datetime | None = Field(None, description="UTC timestamp when processing completed.")
 
 
 # BigQuery
@@ -55,4 +56,4 @@ class BigQueryHistoryRecord(BaseModel):
     visibility_score: float
     timestamp: datetime
     llm_response: str                  # Important for historical audit
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

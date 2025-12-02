@@ -8,6 +8,7 @@ from app.db.big_query.client import BigQueryClient
 from app.db.big_query.schemas import QueryParameters
 from app.core.models import BigQueryHistoryRecord
 from app.core.config import settings
+from datetime import datetime, timezone
 
 
 class BigQueryService:
@@ -61,14 +62,21 @@ class BigQueryService:
         row_to_insert = record.model_dump()
         
         # BigQuery expects the timestamp as a string or compatible object
-        row_to_insert['timestamp'] = row_to_insert['timestamp'].isoformat()
-        
-        # Define the synchronous function to execute in the thread pool
-        def sync_insert():
-            return self.client.insert_rows_json(
-                table=self.table_ref,
-                json_rows=[row_to_insert]
-            )
+        # row_to_insert['timestamp'] = row_to_insert['timestamp'].isoformat()
+        # Convert ALL datetime fields to ISO 8601 strings
+        for key, value in row_to_insert.items():
+            if isinstance(value, datetime):
+                # BigQuery DATETIME must be naive (no timezone)
+                naive = value.replace(tzinfo=None)
+                # Output example: "2025-12-02T04:46:22.924708"
+                row_to_insert[key] = naive.isoformat()
+                
+                # Define the synchronous function to execute in the thread pool
+                def sync_insert():
+                    return self.client.insert_rows_json(
+                        table=self.table_ref,
+                        json_rows=[row_to_insert]
+                    )
 
         try:
             # Use to_thread.run_sync to run the blocking database call
