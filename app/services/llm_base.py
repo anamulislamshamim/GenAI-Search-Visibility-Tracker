@@ -3,6 +3,7 @@ import asyncio
 from abc import ABC, abstractmethod
 from google import genai
 from google.genai.errors import APIError
+from ollama import AsyncClient
 
 # --- Abstract Base Class (LLMBase) ---
 
@@ -18,6 +19,37 @@ class LLMBase(ABC):
     async def generate_response(self, prompt: str) -> str:
         """Generates a text response for the given prompt."""
         pass
+
+
+class OllamaLLM(LLMBase):
+    """LLM client for locally running models via Ollama."""
+
+    def __init__(self, model_name: str = "gemma:2b"):
+        super().__init__(model_name=model_name, api_key=None)
+        self.client = AsyncClient()
+
+    async def generate_response(self, prompt: str) -> str:
+        print("Debug: Ollama")
+        response = await self.client.chat(
+            model=self.model_name,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return response["message"]["content"]
+
+    async def ensure_model_downloaded(self):
+        models = await self.client.list()
+
+        # each entry looks like: {"model": "gemma:2b", ...}
+        available = [m["model"] for m in models.get("models", [])]
+
+        if self.model_name not in available:
+            print(f"[Ollama] Pulling model '{self.model_name}'...")
+            async for status in await self.client.pull(self.model_name):
+                print(status)  # streaming progress (optional)
+            print(f"[Ollama] Model '{self.model_name}' downloaded.")
+        else:
+            print(f"[Ollama] Model '{self.model_name}' already exists.")
+
 
 # For testing purpose locally
 class MockHuggingFaceModel(LLMBase):

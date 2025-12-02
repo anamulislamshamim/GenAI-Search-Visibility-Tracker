@@ -1,4 +1,4 @@
-from .llm_base import LLMBase, MockHuggingFaceModel, GeminiClient
+from .llm_base import LLMBase, MockHuggingFaceModel, GeminiClient, OllamaLLM
 from app.core.config import settings, LLMProvider
 
 
@@ -7,6 +7,9 @@ def get_llm_service() -> LLMBase:
     
     if settings.LLM_PROVIDER == LLMProvider.HUGGINGFACE:
         return MockHuggingFaceModel(settings.HUGGINGFACE_MODEL)
+    
+    elif settings.LLM_PROVIDER == LLMProvider.OLLAMA:
+        return OllamaLLM(settings.OLLAMA_MODEL)
     
     elif settings.LLM_PROVIDER == LLMProvider.GEMINI:
         if not settings.GEMINI_API_KEY:

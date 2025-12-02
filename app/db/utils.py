@@ -6,6 +6,7 @@ from app.db.elasticsearch.indexing import initialize_es_index
 from app.db.postgres.client import connect_to_postgres, close_postgres, _create_brand_performance_table
 from app.analysis.nlp_pipeline import initialize_nlp_models
 from app.db.big_query.service import connect_to_big_query, close_big_query
+from app.services.llm_base import OllamaLLM
 
 async def connect_to_dbs():
     """Initializes and connects to all database clients."""
@@ -18,6 +19,10 @@ async def connect_to_dbs():
     await initialize_nlp_models()
     await _create_brand_performance_table()
     await initialize_es_index()
+
+    # initialize Ollama models gemma:2B
+    ollama_client = OllamaLLM()
+    await ollama_client.ensure_model_downloaded()
 
 async def close_dbs():
     """Closes all database connections."""

@@ -10,6 +10,7 @@ class LLMProvider(str, Enum):
     HUGGINGFACE = "HUGGINGFACE"
     GEMINI = "GEMINI"
     OPENAI = "OPENAI"
+    OLLAMA = "OLLAMA"
 
 class Settings(BaseSettings):
     # Load configuration from .env file 
@@ -19,8 +20,9 @@ class Settings(BaseSettings):
     ENVIRONMENT: Environment = Environment.LOCAL
 
     # --- LLM Settings ---
-    LLM_PROVIDER: LLMProvider = LLMProvider.GEMINI
+    LLM_PROVIDER: LLMProvider = LLMProvider.OLLAMA
     HUGGINGFACE_MODEL: str = "local/mock-model"
+    OLLAMA_MODEL: str = "gemma:2b"
     GEMINI_API_KEY: str | None = None
     OPENAI_API_KEY: str | None = None
 

@@ -28,10 +28,16 @@ app = FastAPI(
     version="1.0.0",
 )
 
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    # Add your production frontend domain here when deploying, e.g., "https://yourapp.com"
+]
+
 app.add_middleware(
     CORSMiddleware,
     # Allow all origins for now, but uncomment 'allow_origins' below for production
-    allow_origins=["*"], # WARNING: Use specific origins in production!
+    allow_origins=origins,
     # allow_origins=origins, # Use this in production
     
     # Allow credentials (necessary for cookies/JWT in HTTP-only cookies)
