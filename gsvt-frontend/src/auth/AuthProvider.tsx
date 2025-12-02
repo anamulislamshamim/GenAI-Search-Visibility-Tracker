@@ -29,6 +29,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkSession();
   }, []);
 
+  // 🔵 signup
+  const signup = async (email: string, password: string) => {
+    await api.post(
+      "/auth/signup",
+      { email, password },
+      { withCredentials: true }
+    );
+  };
+
   // 🔵 Login: backend will set cookie
   const login = async (email: string, password: string) => {
     await api.post(
@@ -51,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   if (loading) return null;
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, signup }}>
       {children}
     </AuthContext.Provider>
   );
