@@ -48,7 +48,7 @@ const QueryForm: React.FC<Props> = ({ onSubmitted }) => {
       loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
     }`}
   >
-    {loading ? "Submitting..." : "Query Brand"}
+    {loading ? "Submitting..." : "Check Brand Visibility"}
   </button>
 
   {err && <p className="text-red-500 text-sm">{err}</p>}

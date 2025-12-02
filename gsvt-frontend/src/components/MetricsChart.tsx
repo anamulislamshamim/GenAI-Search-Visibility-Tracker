@@ -39,7 +39,7 @@ const MetricsChart: React.FC<Props> = ({ metrics }) => {
   return (
     <div className="chart-container max-w-lg mx-auto mt-8">
       <h3 className="text-2xl font-bold text-gray-800 text-center">
-        Aggregate Metrics
+        Visibility Metrics
       </h3>
 
       <p className="text-center text-gray-600 mt-2">
