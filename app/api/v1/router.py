@@ -114,11 +114,11 @@ async def get_brand_metrics_aggregate(
     try:
         metrics = await big_query_client.get_brand_metrics(brand_name=brand_name)
         
-        if metrics['total_queries'] == 0:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"No historical queries found for brand '{brand_name}'."
-            )
+        # if metrics['total_queries'] == 0:
+        #     raise HTTPException(
+        #         status_code=status.HTTP_404_NOT_FOUND,
+        #         detail=f"No historical queries found for brand '{brand_name}'."
+        #     )
             
         return metrics
         

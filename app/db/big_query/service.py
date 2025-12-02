@@ -22,14 +22,17 @@ class BigQueryService:
         print(f"BigQuery Service connected to table: {self.full_table_id}")
 
 
-    def run_query(self, sql_query: str, params: QueryParameters = QueryParameters()) -> List[Dict[str, Any]]:
+    def run_query(
+        self, 
+        sql_query: str, 
+        params: QueryParameters = QueryParameters(),
+        job_config: bigquery.QueryJobConfig = None
+    ) -> List[Dict[str, Any]]:
         try:
-            # Configure job and run query
-            job_config = bigquery.QueryJobConfig()
-            query_job: QueryJob = self.client.query(
+            query_job: bigquery.QueryJob = self.client.query(
                 sql_query,
-                job_config=job_config,
-                timeout=params.timeout_ms / 1000  # Convert ms to seconds
+                job_config=job_config,  # now accepts parameterized queries
+                timeout=params.timeout_ms / 1000
             )
 
             # Wait for the job to complete and fetch results
@@ -95,20 +98,20 @@ class BigQueryService:
     
     async def get_brand_metrics(self, brand_name: str) -> Dict[str, float]:
         # Add wildcards for partial matching
-        search_value = f"%{brand_name}%"
+        # search_value = f"%{brand_name}%"
 
         query = f"""
             SELECT
                 COUNT(visibility_score) AS total_queries,
                 AVG(visibility_score) AS average_score
             FROM `{self.full_table_id}`
-            WHERE LOWER(brand_name) LIKE LOWER(@brand_name);
+            WHERE LOWER(brand_keyword) LIKE LOWER(@brand_name);
         """
 
         # BigQuery query parameters
         job_config = bigquery.QueryJobConfig(
             query_parameters=[
-                bigquery.ScalarQueryParameter("brand_name", "STRING", search_value)
+                bigquery.ScalarQueryParameter("brand_name", "STRING", brand_name)
             ]
         )
 
@@ -121,11 +124,15 @@ class BigQueryService:
             return {
                 "brand_name": brand_name,
                 "total_queries": row.get("total_queries", 0),
-                "average_score": float(row.get("average_score", 0.0)) if row.get("average_score") is not None else 0.0
+                "average_visibility_score": round(float(row.get("average_score", 0.0)) if row.get("average_score") is not None else 0.0, 2)
             }
 
         # Fallback
-        return {"total_queries": 0, "average_score": 0.0}
+        return {
+            "brand_name": brand_name,
+            "total_queries": 0,
+            "average_visibility_score": 0.0
+        }
 
 
 BQ_SERVICE = None
