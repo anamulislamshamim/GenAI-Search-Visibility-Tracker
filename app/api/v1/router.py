@@ -7,7 +7,7 @@ import datetime
 import asyncio
 from app.analysis.nlp_pipeline import start_analysis_pipeline
 from app.db.mongodb.storage import insert_query_record, get_query_details_by_id
-from app.db.postgres.storage import get_brand_metrics
+from app.db.big_query.service import get_big_query
 from app.middlewares.auth_middleware import get_current_user
 
 
@@ -110,8 +110,9 @@ async def get_brand_metrics_aggregate(
     """
     Feature 5 (Aggregate): Retrieves historical average metrics (PostgreSQL).
     """
+    big_query_client = get_big_query()
     try:
-        metrics = await get_brand_metrics(brand_name)
+        metrics = await big_query_client.get_brand_metrics(brand_name=brand_name)
         
         if metrics['total_queries'] == 0:
             raise HTTPException(

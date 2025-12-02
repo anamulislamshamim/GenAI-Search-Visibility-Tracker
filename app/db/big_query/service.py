@@ -47,13 +47,13 @@ class BigQueryService:
     
     async def insert_record(self, record: BigQueryHistoryRecord) -> bool:
         """
-        Inserts a single LogRecord into the configured BigQuery table asynchronously.
+        Inserts a single BigQueryHistoryRecord into the configured BigQuery table asynchronously.
         
         Uses to_thread.run_sync to safely call the synchronous BigQuery client 
         without blocking the main FastAPI event loop.
 
         Args:
-            record: A validated LogRecord Pydantic model instance.
+            record: A validated BigQueryHistoryRecord Pydantic model instance.
         
         Returns:
             True if insertion was successful, False otherwise.
@@ -92,6 +92,40 @@ class BigQueryService:
         except Exception as e:
             print(f"An error occurred during asynchronous insertion: {e}")
             return False
+    
+    async def get_brand_metrics(self, brand_name: str) -> Dict[str, float]:
+        # Add wildcards for partial matching
+        search_value = f"%{brand_name}%"
+
+        query = f"""
+            SELECT
+                COUNT(visibility_score) AS total_queries,
+                AVG(visibility_score) AS average_score
+            FROM `{self.full_table_id}`
+            WHERE LOWER(brand_name) LIKE LOWER(@brand_name);
+        """
+
+        # BigQuery query parameters
+        job_config = bigquery.QueryJobConfig(
+            query_parameters=[
+                bigquery.ScalarQueryParameter("brand_name", "STRING", search_value)
+            ]
+        )
+
+        # Execute the query synchronously
+        results = self.run_query(sql_query=query, job_config=job_config)
+
+        # Parse first row (BigQuery always returns at least 1 row)
+        if results:
+            row = results[0]
+            return {
+                "brand_name": brand_name,
+                "total_queries": row.get("total_queries", 0),
+                "average_score": float(row.get("average_score", 0.0)) if row.get("average_score") is not None else 0.0
+            }
+
+        # Fallback
+        return {"total_queries": 0, "average_score": 0.0}
 
 
 BQ_SERVICE = None
