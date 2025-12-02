@@ -4,7 +4,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from sentence_transformers import SentenceTransformer, util
 import datetime
 
-from app.db.elasticsearch.indexing import index_analysis_document
+from app.db.elasticsearch.indexing import index_analysis_document, get_visibility_scores
 from app.db.mongodb.storage import update_query_status_and_score
 from app.db.big_query.service import get_big_query
 
@@ -165,8 +165,8 @@ async def start_analysis_pipeline(response_id: str, brand_name: str, raw_llm_res
     correctness = calculate_correctness_score(raw_llm_response, brand_name)
 
     # Placeholder: get last N scores from DB to measure consistency
-    previous_scores = []  # You can later fetch from PostgreSQL/BigQuery
-    consistency = calculate_model_consistency(previous_scores, sentiment_score)
+    previous_sentiment_scores = await get_visibility_scores(brand_name=brand_name) # You can later fetch from elasticsearch using full text.
+    consistency = calculate_model_consistency(previous_sentiment_scores, sentiment_score)
 
     # 3. Final enhanced visibility score
     visibility_score = calculate_visibility_score(

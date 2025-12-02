@@ -45,6 +45,7 @@ async def get_visibility_scores(brand_name: str) -> List[Dict[str, Any]]:
                 "keywords": brand_name  # full-text search
             }
         },
+        "_source": ["sentiment_score"],
         "size": 1000
     }
 
