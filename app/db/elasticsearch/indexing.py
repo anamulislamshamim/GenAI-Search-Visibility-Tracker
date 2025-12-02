@@ -1,5 +1,6 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from app.db.elasticsearch.client import ES_INDEX_NAME, get_es_client
+from elasticsearch import AsyncElasticsearch
 
 # Index mapping defines the schema for documents in Elasticsearch
 INDEX_MAPPING: Dict[str, Any] = {
@@ -33,6 +34,26 @@ async def initialize_es_index():
     else:
         print(f"Elasticsearch index '{ES_INDEX_NAME}' already exists.")
     print(f"Elasticsearch index setup simulated for '{ES_INDEX_NAME}'.")
+
+
+async def get_visibility_scores(brand_name: str) -> List[Dict[str, Any]]:
+    es_client: AsyncElasticsearch = get_es_client()
+
+    query = {
+        "query": {
+            "match": {
+                "keywords": brand_name  # full-text search
+            }
+        },
+        "size": 1000
+    }
+
+    response = await es_client.search(index=ES_INDEX_NAME, body=query)
+
+    hits = response.get("hits", {}).get("hits", [])
+    visibility_scores = [hit["_source"]["visibility_score"] for hit in hits if "visibility_score" in hit["_source"]]
+
+    return visibility_scores
 
 
 async def index_analysis_document(document: Dict[str, Any]) -> None:
