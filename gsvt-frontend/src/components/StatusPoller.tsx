@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import api from "../api/apiClient";
+import Markdown from 'react-markdown';
 
 type Props = {
   responseId: string;
@@ -85,7 +86,7 @@ const StatusPoller: React.FC<Props> = ({ responseId, brandName, onCompleteMetric
             <strong>Visibility Score:</strong> {lastPayload.visibility_score}
           </p>
           <p className="mb-2 whitespace-pre-wrap">
-            <strong>LLM Response:</strong> {lastPayload.raw_llm_response}
+            <strong>LLM Response:</strong> <Markdown>{lastPayload.raw_llm_response}</Markdown>
           </p>
           <p className="text-gray-500 text-sm">
             Processed at: {new Date(lastPayload.processed_at).toLocaleString()}
@@ -97,79 +98,3 @@ const StatusPoller: React.FC<Props> = ({ responseId, brandName, onCompleteMetric
 };
 
 export default StatusPoller;
-
-
-
-// import React, { useEffect, useState, useRef } from "react";
-// import api from "../api/apiClient";
-
-// type Props = {
-//   responseId: string;
-//   brandName: string;
-//   onCompleteMetrics: (metrics: { total_query: number; average_visibility: number }) => void;
-// };
-
-// const POLL_INTERVAL = 3000;
-
-// const StatusPoller: React.FC<Props> = ({ responseId, brandName, onCompleteMetrics }) => {
-//   const [status, setStatus] = useState("Processing");
-//   const [lastPayload, setLastPayload] = useState<any>(null);
-
-//   const timerRef = useRef<number | null>(null);
-//   const hasCompletedRef = useRef(false);  // <-- prevents infinite loop
-
-//   useEffect(() => {
-//     hasCompletedRef.current = false;  // reset on new responseId
-
-//     const poll = async () => {
-//       if (hasCompletedRef.current) return; // <-- stop future calls
-
-//       try {
-//         const resp = await api.get(`/api/v1/query/${responseId}`);
-//         const data = resp.data;
-
-//         setLastPayload(data);
-//         setStatus(data.status || "Processing");
-
-//         if (String(data.status).toLowerCase() === "complete") {
-//           hasCompletedRef.current = true;   // <-- mark completed
-
-//           // stop polling
-//           if (timerRef.current) {
-//             clearInterval(timerRef.current);
-//             timerRef.current = null;
-//           }
-
-//           // now safely fetch metrics once
-//           const metricsResp = await api.get(
-//             `/api/v1/metrics/aggregate/brand/${encodeURIComponent(brandName)}`
-//           );
-
-//           onCompleteMetrics(metricsResp.data);
-//         }
-//       } catch (error) {
-//         console.error("Polling error:", error);
-//       }
-//     };
-
-//     // initial immediate poll
-//     poll();
-
-//     // start interval
-//     timerRef.current = window.setInterval(poll, POLL_INTERVAL);
-
-//     return () => {
-//       if (timerRef.current) clearInterval(timerRef.current);
-//     };
-//   }, [responseId, brandName]);
-
-//   return (
-//     <div>
-//       <h3>Status: {status}</h3>
-//       {status.toLowerCase() === "processing" && <p>Processing...checking every 3 seconds</p>}
-//       <pre>{JSON.stringify(lastPayload, null, 2)}</pre>
-//     </div>
-//   );
-// };
-
-// export default StatusPoller;
