@@ -1,7 +1,76 @@
+![Architecture](images/gen_ai_architecture.png)
 
----
+# **Project Structure**
 
-# 🌐 GenAI Search Visibility Tracker (GSVT)
+```
+project/
+│
+├── app/
+│   ├── analysis/
+│   │   ├── __init__.py
+│   │   └── nlp_pipeline.py
+│   │
+│   ├── api/
+│   │   ├── __init__.py
+│   │   └── v1/
+│   │       ├── __init__.py
+│   │       └── router.py
+│   │
+│   ├── auth/
+│   │   ├── __init__.py
+│   │   ├── core/
+│   │   │   ├── __init__.py
+│   │   │   └── utils.py
+│   │   ├── models/
+│   │   │   ├── __init__.py
+│   │   │   └── auth_models.py
+│   │   └── routers/
+│   │       ├── __init__.py
+│   │       └── auth_router.py
+│   │
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   └── models.py
+│   │
+│   ├── db/
+│   │   ├── __init__.py
+│   │   ├── utils.py
+│   │   ├── big_query/
+│   │   │   ├── __init__.py
+│   │   │   ├── client.py
+│   │   │   ├── schemas.py
+│   │   │   └── service.py
+│   │   ├── elasticsearch/
+│   │   │   ├── __init__.py
+│   │   │   ├── client.py
+│   │   │   └── indexing.py
+│   │   ├── mongodb/
+│   │   │   ├── __init__.py
+│   │   │   ├── client.py
+│   │   │   └── storage.py
+│   │   └── postgres/
+│   │       ├── __init__.py
+│   │       ├── client.py
+│   │       └── storage.py
+│   │
+│   └── middlewares/
+│       ├── __init__.py
+│       └── auth_middleware.py
+│
+├── services/
+│
+├── gsvt-frontend/
+│
+├── images/
+│
+├── main.py
+├── docker-compose.yaml
+├── requirements.txt
+├── README.md
+└── .gitignore
+```
+# GenAI Search Visibility Tracker (GSVT)
 
 A full-stack application designed to mirror the architecture, workflow, and generative search principles used at **elelem AI**—the world’s most advanced Generative Engine Optimization (GEO) platform.
 
@@ -9,7 +78,7 @@ This project demonstrates dual-environment deployment (GCP Cloud Run + Docker), 
 
 ---
 
-# 🧭 Purpose of the Project
+# Purpose of the Project
 
 GSVT allows users to:
 
@@ -24,13 +93,13 @@ This aligns directly with **elelem AI’s mission**:
 
 ---
 
-# 🔄 How It Works
+# How It Works
 
 The GenAI Search Visibility Tracker (GSVT) follows a simple but powerful pipeline designed to mirror how elelem AI analyzes GenAI-driven brand visibility.
 
 ---
 
-## **1️⃣ User Searches With a Brand Name (Not Full Questions)**
+## **User Searches With a Brand Name (Not Full Questions)**
 
 The user provides a **brand keyword**, such as:
 
@@ -53,7 +122,7 @@ This aligns with GEO (Generative Engine Optimization) workflows, where brand-lev
 
 ---
 
-## **2️⃣ Backend Queries Gemini & Performs RAG-Based Scoring**
+## **Backend Queries Gemini & Performs RAG-Based Scoring**
 
 Once a brand name is submitted, the backend performs the following steps:
 
@@ -74,23 +143,33 @@ Once a brand name is submitted, the backend performs the following steps:
   * document retrieval
   * contextual comparison
 
-### **C. Run Visibility Scoring (NLP + Embeddings)**
-
-Using **NLTK + HuggingFace embeddings**, the backend computes:
-
-| Metric                       | Description                                                              |
-| ---------------------------- | ------------------------------------------------------------------------ |
-| **Brand Mention Score**      | Whether and how strongly the brand appears in the response               |
-| **Content Accuracy Score**   | Checks if the AI model generated relevant, truthful, or expected content |
-| **Relevance Score**          | How closely the response matches Elasticsearch-ranked documents          |
-| **Visibility Score (0–100)** | Combined weighted score measuring brand visibility inside GenAI          |
-
-A simplified visibility calculation might include:
-
-* Brand frequency
-* Keyword matching
-* Semantic similarity
-* Sentiment (optional)
+### **How We Calculate Visibility Score**
+* **sentiment_score** — Measures overall sentiment of the LLM response (positive, neutral, negative).
+* **semantic_similarity** — Vector-based similarity between the LLM response and ground-truth brand information.
+* **keyword_match** — Ratio of expected brand-related keywords found in the LLM response.
+* **brand_freq** — How frequently the brand name appears within the LLM response.
+* **correctness** — Checks factual accuracy of the LLM response against known brand attributes.
+* **consistency** — Measures whether the LLM response aligns consistently with previous responses for the same brand.
+```bash
+weights = {
+    "sentiment": 0.20,
+    "semantic": 0.25,
+    "keyword": 0.15,
+    "brand_freq": 0.15,
+    "correctness": 0.15,
+    "consistency": 0.10,
+}
+```
+```bash
+score = (
+    sentiment_score * weights["sentiment"] +
+    semantic_similarity * weights["semantic"] +
+    keyword_match * weights["keyword"] +
+    brand_freq * weights["brand_freq"] +
+    correctness * weights["correctness"] +
+    consistency * weights["consistency"]
+)
+```
 
 ### **D. Store Calculated Metrics in Analytics Storage**
 
@@ -99,20 +178,9 @@ Metrics are stored in:
 * **BigQuery** (cloud mode)
 * **PostgreSQL** (local mode)
 
-Each record includes:
-
-* brand name
-* timestamp
-* raw LLM response ID
-* visibility score
-* keyword extraction data
-* LLM model used (e.g., Gemini 1.5 Flash)
-
-This creates a traceable, analytic-friendly dataset.
-
 ---
 
-## **3️⃣ User Retrieves Visibility Metrics**
+## **User Retrieves Visibility Metrics**
 
 Users can query the analytics API to retrieve metrics such as:
 
@@ -123,38 +191,23 @@ Example:
 ```json
 {
   "brand": "Pathao",
-  "query_count": 14
 }
 ```
 
-### **B. Average Visibility Score**
+### **Response**
 
 Example:
 
 ```json
 {
   "brand": "Pathao",
+  "query_count": 14,
   "average_visibility_score": 82.5
 }
 ```
-
-### **C. Latest Indexed Responses (Optional)**
-
-Example:
-
-* Last 5 responses
-* Latest brand accuracy trend
-* Daily/weekly visibility changes
-
-This gives users insight into:
-
-* How often the brand is checked
-* How clearly the brand appears in LLMs
-* Whether visibility is improving or declining
-
 ---
 
-# 📘 Example Workflow Summary
+# Example Workflow Summary
 
 ```
 User → Brand Query → Backend → Gemini → Store Raw Response (MongoDB)
@@ -164,7 +217,7 @@ User → Brand Query → Backend → Gemini → Store Raw Response (MongoDB)
 
 ---
 
-# 🛠️ Technologies & Why They Were Chosen
+# Technologies & Why They Were Chosen
 
 | Component               | Technology                                | Why This Technology?                                                                                          |
 | ----------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -183,7 +236,7 @@ environment mirroring cloud behavior.                                       |
 
 ---
 
-# ⚙️ Setup Instructions
+# Setup Instructions
 
 ## Prerequisites
 
@@ -223,13 +276,16 @@ pip install -r requirements.txt
 ## 4. Configure Environment
 
 Create a `.env` file and set:
-```python
-ENVIRONMENT=LOCAL
+```bash
+ENVIRONMENT=CLOUD
 # LOCAL | CLOUD (determines database/LLM usage)
-LLM_PROVIDER=GEMINI  # HUGGINGFACE | GEMINI | OPENAI
+LLM_PROVIDER=GEMINI  # HUGGINGFACE | GEMINI | OPENAI | Ollama
 HUGGINGFACE_MODEL=local/brand-visibility-mock-model
-GEMINI_API_KEY=
+GEMINI_API_KEY=AIzaSyASsLTqTP53YaAD5geDLycB9s63mQ99VUI
 OPENAI_API_KEY=
+OLLAMA_MODEL=gemma:2b
+
+# --- Data Store Configuration (Local Docker) ---
 MONGO_URI=""
 MONGO_DB_NAME="query_analytics"
 MONGO_COLLECTION_NAME="brand_analysis"
@@ -238,13 +294,19 @@ ELASTICSEARCH_API_KEY=""
 ES_INDEX_NAME="brand_analysis"
 POSTGRES_URL=""
 POSTGRES_TABLE="brand_analysis"
+
 # JWT AUTH
 SECRET_KEY="secret-Es9nWgtOMlzHz6UdzW"
 ALGORITHM="HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES=1440
+
+# big query
+GCP_PROJECT_ID=''
+BQ_DATASET_ID=''
+BQ_TABLE_ID=''
 ```
 
-> All behavior switches based on `RUN_ENV`.
+> All behavior switches based on `.env`.
 
 ---
 
@@ -277,7 +339,7 @@ Frontend is deployed separately to Cloud Run.
 
 ---
 
-# 🔒 API Endpoints
+# API Endpoints
 
 ## Authentication
 
@@ -298,7 +360,7 @@ Frontend is deployed separately to Cloud Run.
 
 ---
 
-# 📊 What This Backend Provides
+# What This Backend Provides
 
 ✔ GenAI-search visibility tracking<br>
 ✔ RAG-style response scoring<br>
@@ -310,10 +372,10 @@ Frontend is deployed separately to Cloud Run.
 
 ---
 
-# 🎯 Summary
+# Summary
 
 This project is intentionally designed to mimic the architecture, engineering culture, and technical expectations of **elelem AI**.
-By using the same cloud stack, caching, search engine, and GenAI-driven data pipeline, this application demonstrates:
+By using the same cloud stack, search engine, and GenAI-driven data pipeline, this application demonstrates:
 
 * Practical backend engineering skills
 * Strong architectural thinking
@@ -321,4 +383,5 @@ By using the same cloud stack, caching, search engine, and GenAI-driven data pip
 * Cloud-native deployment proficiency
 * Ability to work in a distributed, multi-environment system
 
----
+# End Result
+![End Result](images/gen_ai_visibility_1.png)
