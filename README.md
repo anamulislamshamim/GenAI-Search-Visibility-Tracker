@@ -306,7 +306,16 @@ Local services started:
 We can follow the above steps for Cloud as well or can buit CI/CD
 ```
 
-Frontend is deployed separately to Cloud Run.
+### **Frontend**
+In this project, I focused on backend. That's I don't want to share much about fronted. I containerized frontend.
+Run the following commands.
+```bash
+cd gsvt-frontend
+# build image from the Dockerfile
+docker build -t gsvt-frontend .
+# Build and run container
+docker run -p 3000:80 gsvt-frontend
+```
 
 ---
 
