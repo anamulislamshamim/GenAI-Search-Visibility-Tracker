@@ -1,0 +1,39 @@
+# Ignore frontend inside backend project
+gsvt-frontend/
+
+# Node-related artifacts (if someone accidentally installs deps)
+node_modules/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env/
+
+# Git files
+.git
+.gitignore
+
+# Docker-related files
+Dockerfile
+docker-compose.yaml
+
+# Ignore local data, logs
+*.log
+data/
+logs/
+
+# IDE/Editor files
+.vscode/
+.idea/
+
+# OS-generated junk
+.DS_Store
+Thumbs.db
+
+# Images or screenshot directory from your project
+images/
