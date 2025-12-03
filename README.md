@@ -6,6 +6,7 @@ User → Brand Query → FastAPI Backend → OLAMA gemma:2B/Gemini → Store Que
        → Elasticsearch Indexing (Used later for calculating consistency) → NLP/Embedding Scoring
        → Save Metrics (BigQuery/PostgreSQL) → User Fetches Metrics
 ```
+![End Result](images/gen_ai_visibility_1.png)
 # **Project Structure**
 ```
 project/
@@ -375,6 +376,3 @@ By using the same cloud stack, search engine, and GenAI-driven data pipeline, th
 * Experience with GEO-style systems
 * Cloud-native deployment proficiency
 * Ability to work in a distributed, multi-environment system
-
-# End Result
-![End Result](images/gen_ai_visibility_1.png)
