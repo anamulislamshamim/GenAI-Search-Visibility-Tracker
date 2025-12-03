@@ -59,16 +59,16 @@ project/
 │       └── auth_middleware.py
 │
 ├── services/
-│
 ├── gsvt-frontend/
-│
 ├── images/
-│
+├── .dockerignore
+├── .gitignore
 ├── main.py
 ├── docker-compose.yaml
+├── Dockerfile
 ├── requirements.txt
 ├── README.md
-└── .gitignore
+└── requirements.txt
 ```
 # GenAI Search Visibility Tracker (GSVT)
 
