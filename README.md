@@ -1,7 +1,12 @@
 ![Architecture](images/gen_ai_architecture.png)
 
+# Example Workflow Summary
+```
+User → Brand Query → FastAPI Backend → OLAMA gemma:2B/Gemini → Store Query Details (MongoDB)
+       → Elasticsearch Indexing (Used later for calculating consistency) → NLP/Embedding Scoring
+       → Save Metrics (BigQuery/PostgreSQL) → User Fetches Metrics
+```
 # **Project Structure**
-
 ```
 project/
 │
@@ -205,16 +210,6 @@ Example:
   "average_visibility_score": 82.5
 }
 ```
----
-
-# Example Workflow Summary
-
-```
-User → Brand Query → Backend → Gemini → Store Raw Response (MongoDB)
-       → Elasticsearch Indexing → NLP/Embedding Scoring
-       → Save Metrics (BigQuery/PostgreSQL) → User Fetches Metrics
-```
-
 ---
 
 # Technologies & Why They Were Chosen
