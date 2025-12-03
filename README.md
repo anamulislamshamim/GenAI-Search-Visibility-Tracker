@@ -155,7 +155,7 @@ score = (
 )
 ```
 
-### **D. Store Calculated Metrics in Analytics Storage**
+### **Store Calculated Metrics in Analytics Storage**
 
 Metrics are stored in:
 
@@ -196,9 +196,8 @@ Example:
 | Component               | Technology                                | Why This Technology?                                                                                          |
 | ----------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | **Backend Framework**   | **FastAPI**                               | High-performance Python framework used heavily at elelem; async-first; ideal for microservices + Cloud Run.   |
-| **GenAI Integration**   | **Gemini Free API**                       | Allows testing LLM-response behavior without paid credits; matches elelem’s GenAI data ingestion workflow.    |
+| **GenAI Integration**   | **Gemini/OLAMA gemma:2B**                       | Allows testing LLM-response behavior without paid credits; matches elelem’s GenAI data ingestion workflow.    |
 | **Primary Database**    | **MongoDB Atlas / Docker MongoDB**        | Flexible schema for storing LLM responses, brand logs, user profiles; identical to elelem’s backend design.   |
-| **Cache Layer**         | **Redis / Redis Cloud**                   | Used for throttling, caching LLM responses, and improving API latency; mirrors elelem’s cloud stack.          |
 | **Search & RAG Engine** | **Elasticsearch**                         | Core requirement; supports vectorization, similarity search, and indexing LLM answers—critical for GEO tasks. |
 | **Analytics Warehouse** | **BigQuery (Cloud) / PostgreSQL (Local)** | Enables aggregation + trend analysis; exactly matches elelem’s GCP data pipeline.                             |
 | **Frontend**            | **React (Cloud Run)**                     | Interactive dashboard for brand visibility analytics.                                                         |
