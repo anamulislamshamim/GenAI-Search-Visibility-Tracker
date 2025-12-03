@@ -35,6 +35,41 @@ services:
       - app-network
 
   # 3. Elasticsearch Service (for full-text search and indexing)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.2.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - app-network
+    restart: unless-stopped
+  # 4. FastAPI Backend Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi_backend
+    restart: always
+    depends_on:
+      # Ensures DB containers start before FastAPI app
+      - mongodb
+      - postgres
+      - elasticsearch
+    environment:
+      # Add your ENV variables here
+      MONGO_URI: "mongodb://127.0.0.1:27017"
+      POSTGRES_URI: "postgresql://user:password@postgres:5432/main_db"
+      ELASTICSEARCH_URL: "http://127.0.0.1:9200"
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
 
 networks:
   app-network:
@@ -43,3 +78,4 @@ networks:
 volumes:
   mongo_data:
   postgres_data:
+  es_data:

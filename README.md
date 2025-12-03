@@ -329,8 +329,6 @@ Local services started:
 
 ### **Cloud (GCP Cloud Run)**
 
-Build + deploy:
-
 ```bash
 We can follow the above steps for Cloud as well or can buit CI/CD
 ```
