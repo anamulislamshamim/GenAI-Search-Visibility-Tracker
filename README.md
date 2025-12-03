@@ -88,7 +88,7 @@ This project demonstrates dual-environment deployment (GCP Cloud Run + Docker), 
 
 GSVT allows users to:
 
-* Query a **GenAI model (Gemini Free Plan)** to check how a brand appears in AI-generated responses.
+* Query a **GenAI model (OLAMA/GEMINI)** to check how a brand appears in AI-generated responses.
 * Store, index, and analyze these responses through a **RAG-like relevance system** built on Elasticsearch.
 * Compute a **visibility score** that reflects brand discoverability inside GenAI platforms.
 * Visualize analytics in a React dashboard.
@@ -127,28 +127,6 @@ Example input:
 This aligns with GEO (Generative Engine Optimization) workflows, where brand-level query monitoring is the goal.
 
 ---
-
-## **Backend Queries Gemini & Performs RAG-Based Scoring**
-
-Once a brand name is submitted, the backend performs the following steps:
-
-### **A. Query Gemini (or another LLM)**
-
-* Sends the brand keyword as the query.
-* Receives an AI-generated response describing the brand.
-* Stores the **raw LLM response** in MongoDB (for traceability + replay + auditing).
-
-### **B. Trigger Elasticsearch Indexing**
-
-* The system indexes the response text in Elasticsearch.
-* This enables:
-
-  * keyword extraction
-  * similarity search
-  * RAG-style ranking
-  * document retrieval
-  * contextual comparison
-
 ### **How We Calculate Visibility Score**
 * **sentiment_score** — Measures overall sentiment of the LLM response (positive, neutral, negative).
 * **semantic_similarity** — Vector-based similarity between the LLM response and ground-truth brand information.
