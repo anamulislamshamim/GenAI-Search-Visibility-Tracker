@@ -215,7 +215,7 @@ environment mirroring cloud behavior.                                       |
 
 * Python **3.9+**
 * MongoDB Atlas OR Docker MongoDB
-* Redis (local or Redis Cloud)
+* OLLAMA (Download and Installed it locally)
 * Elasticsearch 8.x (local or Elastic Cloud)
 * Node.js (for React/Electron)
 * Docker Desktop (for local multi-service environment)
@@ -255,7 +255,6 @@ ENVIRONMENT=CLOUD
 LLM_PROVIDER=GEMINI  # HUGGINGFACE | GEMINI | OPENAI | Ollama
 HUGGINGFACE_MODEL=local/brand-visibility-mock-model
 GEMINI_API_KEY=AIzaSyASsLTqTP53YaAD5geDLycB9s63mQ99VUI
-OPENAI_API_KEY=
 OLLAMA_MODEL=gemma:2b
 
 # --- Data Store Configuration (Local Docker) ---
@@ -289,6 +288,8 @@ BQ_TABLE_ID=''
 
 * If you use MongoDB, Postgresql, and Elasticsearch locally in Docker
 ```bash
+# to start ollama server
+ollama serve
 cd GenAI-Search-Visibility-Tracker
 docker-compose up -d
 ```
