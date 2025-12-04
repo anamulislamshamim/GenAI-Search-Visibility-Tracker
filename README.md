@@ -6,7 +6,8 @@ User → Brand Query → FastAPI Backend → OLAMA gemma:2B/Gemini → Store Que
        → Elasticsearch Indexing (Used later for calculating consistency) → NLP/Embedding Scoring
        → Save Metrics (BigQuery/PostgreSQL) → User Fetches Metrics
 ```
-![End Result](images/gen_ai_visibility_1.png)
+# **Video Presentation**
+[![Video Presentation](images/gen_ai_visibility_2.png)](https://www.loom.com/share/b770db2b82fe4cbc8ea04b645d0f0c5e)
 # **Project Structure**
 ```
 project/
